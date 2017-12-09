@@ -17,19 +17,6 @@ Player.prototype.newPos = function () {
   this.x += this.speedX;
 } 
 
-Player.prototype.setKeys = function () {
-  document.onkeydown = function (e) {
-    switch (e.keyCode) {
-      case 37:
-        this.moveLeft();
-        break;
-      case 39:
-        this.moveRight();
-        break;
-    }
-  }.bind(this);
-}
-
 Player.prototype.moveLeft = function () {
   this.speedX -= 1;
 }

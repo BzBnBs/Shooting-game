@@ -3,27 +3,49 @@ $(document).ready(function () {
 });
 
 function startGame() {
-  var game = new MyGameArea()
+  var canvas = document.getElementById("canvas");
+  var game = new MyGameArea(canvas.getContext("2d"), canvas.width, canvas.height);
   game.start();
 }
 
 //MODO DE THOR//
-function MyGameArea () {
-  this.canvas = document.createElement("canvas")
-  this.context = this.canvas.getContext("2d");
+function MyGameArea (ctx, width, height) {
+  this.width = width;
+  this.height = height;
+  this.context = ctx;
   this.frameNo = 0;
   this.interval;
-  // this.enemy = new Component(30, 60, "red", 0, 0);
   this.player = new Player(0, 450, 60, 15, "blue", this.context);
+  this.shooter = new Shooter(0, 0, 30, 60, "red", this.context, this.width);
+  // this.bomb = new Bomb(this.player.x, this.player.y, 30, 30, "black", this.context);
+  this.bomb = new Bomb(this.shooter.x, this.shooter.height/2, 30, 30, "black", this.context);
   // this.bomb = new Component(15, 15, "black", 7.5, 45);
 }
 
 MyGameArea.prototype.start = function() {
-  this.canvas.width = 640;
-  this.canvas.height = 480;
-  document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-  this.player.setKeys();
+  // this.shooter.setKeys();
+  // this.player.setKeys();
+  this.setKeys();
   this.interval = setInterval(this.updateGameArea.bind(this), 20);
+}
+
+MyGameArea.prototype.setKeys = function () {
+  document.onkeydown = function (e) {
+    switch (e.keyCode) {
+      case 32:
+        console.log("32");
+        this.shooter.startMove();
+        this.bomb.moveDown();
+        // this.shooter.speed = true;
+        // this.shooter.checkBoundries();
+      case 37:
+        this.player.moveLeft();
+        break;
+      case 39:
+        this.player.moveRight();
+        break;
+    }
+  }.bind(this);
 }
 
 MyGameArea.prototype.updateGameArea = function () {
@@ -35,26 +57,37 @@ MyGameArea.prototype.updateGameArea = function () {
   
   // this.bomb.update();
   // this.bomb.newPos();
-  // this.enemy.update();
   this.player.newPos();
-  this.isInsideCanvas(this.player);
+  this.shooter.newPos();
+  this.bomb.newPos();
+  this.shooter.checkBoundries();
+  this.delimitedByCanvas(this.player);
+  // this.delimitedByCanvas(this.shooter);
+  // if (this.bomb.seeBomb == true) {
+  // } if (this.bomb.seeBomb == false) {
+  // }
   this.player.update();
+  if ( !this.catchBomb() ) {
+    this.bomb.update();
+  }
+  this.shooter.update();
+  this.crashWith();
 }
 
 MyGameArea.prototype.clear = function() {
-  this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  this.context.clearRect(0, 0, 640, 480);
 }
 
 MyGameArea.prototype.stop = function(){
   clearInterval(this.interval);
 }
 
-MyGameArea.prototype.isInsideCanvas = function (component) {
+MyGameArea.prototype.delimitedByCanvas = function (component) {
   if (component.x > this.width - component.width) {
     component.x = this.width - component.width;
     component.speedX = 0;
   } if (component.x < 0) {
-    component.x += 1;
+    component.x = 0;
     component.speedX = 0;
   } else {
     component.x += component.speedX;
@@ -66,10 +99,34 @@ MyGameArea.prototype.everyinterval = function (n) {
   return false;
 }
 
+MyGameArea.prototype.catchBomb = function () {
+  var bombBottomY = this.bomb.y + this. bomb.height;
+  var playerTopY = this.player.y;
+  var playerRightX = this.player.x + this.player.width;
+  var bombRightX = this.bomb.x + this.bomb.width;
+  var playerLeftX = this.player.x;
+  var bombLeftX = this.bomb.x;
+  // if (bombBottomY >= playerTopY && bombLeftX >= playerLeftX - this.bomb.width && bombRightX < playerLeftX + this.player.width) {
+  //   // this.stop();
 
-// function movedown() {
-//   // enemy.speedY += 1;
-//   // player.speedY += 1;
-//   bomb.speedY += 1;
-// }
+  //   return true
+  //   this.bomb.color = "orange";
+  //   this.bomb.disapear();
+  // }else {
+  //   return false
+  // }
+  return bombBottomY >= playerTopY && bombLeftX >= playerLeftX - this.bomb.width && bombRightX < playerLeftX + this.player.width
+}
+
+MyGameArea.prototype.crashWith = function () {
+  // if (this.bomb.y + this.bomb.width >= this.height) {
+    if (this.bomb.y + this.bomb.height >= this.height) {
+    this.stop();
+  }
+}
+
+
+
+
+
 
