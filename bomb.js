@@ -6,7 +6,6 @@ function Bomb(x, y, width, height, color, ctx) {
   this.speedY = 0;
   this.ctx = ctx;
   this.color = color;
-  this.seeBomb = true;
 }
 
 Bomb.prototype.update = function () {
@@ -19,5 +18,9 @@ Bomb.prototype.newPos = function () {
 } 
 
 Bomb.prototype.moveDown = function () {
-  this.speedY += 1;
+  this.speedY = 1;
 }
+
+// Bomb.prototype.clearBomb = function () {
+//   this.context.clearRect(this.x, this.y, this.width, this.height);
+// }
