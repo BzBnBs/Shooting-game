@@ -15,7 +15,7 @@ function MyGameArea (ctx, width, height) {
   this.interval;
   this.player = new Player(0, 450, 60, 15, "blue", this.context);
   this.shooter = new Shooter(0, 0, 30, 60, "red", this.context, this.width);
-  this.bomb = new Bomb(this.shooter.x, this.shooter.height/2, 30, 30, "black", this.context);
+  // this.bomb = new Bomb(this.shooter.x, this.shooter.height/2, 30, 30, "black", this.context);
   this.setOfBombs = [];
 }
 
@@ -45,47 +45,30 @@ MyGameArea.prototype.delimitedByCanvas = function (component) {
   }
 }
 
-// MyGameArea.prototype.catchBomb = function () {
-//   var bombBottomY = this.bomb.y + this. bomb.height;
-//   var playerTopY = this.player.y;
-//   var playerRightX = this.player.x + this.player.width;
-//   var bombRightX = this.bomb.x + this.bomb.width;
-//   var playerLeftX = this.player.x;
-//   var bombLeftX = this.bomb.x;
-//   return bombBottomY >= playerTopY && bombLeftX >= playerLeftX - this.bomb.width && bombRightX < playerLeftX + this.player.width
-// }
-
-MyGameArea.prototype.catchBomb = function () {
-  var bombBottomY = this.bomb.y + this.bomb.height;
-  var playerTopY = this.player.y;
-  var playerRightX = this.player.x + this.player.width;
-  var bombRightX = this.bomb.x + this.bomb.width;
-  var playerLeftX = this.player.x;
-  var bombLeftX = this.bomb.x;
-  return bombBottomY >= playerTopY && bombLeftX >= playerLeftX - this.bomb.width && bombRightX <= playerRightX + this.bomb.width;
-}
-
-MyGameArea.prototype.crashWith = function () {
-    if (this.bomb.y + this.bomb.height >= this.height) {
+MyGameArea.prototype.crashWith = function (bomb) {
+    if (bomb.y + bomb.height >= this.height) {
     this.stop();
   }
 }
 
 MyGameArea.prototype.increaseNumBombs = function () {
-  var myVar = setInterval(function () { this.setOfBombs.push(new Bomb(this.shooter.x, this.shooter.height / 2, 30, 30, "black", this.context)); }.bind(this), 2000);
+  var pushBombs = setInterval(function () { this.setOfBombs.push(new Bomb(this.shooter.x, this.shooter.height / 2, 30, 30, "black", this.context)); }.bind(this), 2000);
+  // var pushBombs = setInterval(function () { this.setOfBombs.push(this.bomb); }.bind(this), 2000);
   console.log(this.setOfBombs);
 }
+
+// MyGameArea.prototype.controlNumBombs = function () {
+//   if(setOfBombs.length > 4){
+//     clearInterval(pushBombs);
+//   }
+// }
 
 MyGameArea.prototype.setKeys = function () {
   document.onkeydown = function (e) {
     switch (e.keyCode) {
       case 32:
         console.log("32");
-        this.shooter.startMove();
-        // this.setOfBombs.forEach(function (e, i) {
-        //   this.setOfBombs[i].moveDown();
-        // })
-        this.bomb.moveDown();
+        this.shooter.isMoving = true;
       case 37:
         this.player.moveLeft();
         break;
@@ -122,50 +105,23 @@ MyGameArea.prototype.updateGameArea = function () {
   this.clear();
   this.player.newPos();
   this.shooter.newPos();
-  this.shooter.checkBoundries();
   this.delimitedByCanvas(this.player);
+  this.shooter.checkBoundries();
+  this.setOfBombs.forEach(function(bomb, index){
+    bomb.newPos();
+    bomb.update();
+    if (this.shooter.isMoving == true){
+      bomb.moveDown();
+    }
+    bomb.update();
+    if(this.player.catchBomb(bomb)){
+      this.setOfBombs.splice(index, 1);
+    }
+    this.crashWith(bomb);
+  }.bind(this))
   this.player.update();
   this.shooter.update();
-  this.setOfBombs.forEach(function (e, i) {
-    this.setOfBombs[i].newPos();
-    this.setOfBombs[i].moveDown();
-    this.setOfBombs[i].update();
-  }.bind(this))
-  this.crashWith()
 }
-
-
-
-  // this.bomb.update();
-  // this.bomb.newPos();
-
-  // if ( !this.catchBomb() ) {
-  //   this.bomb.update();
-  //   this.crashWith();
-  // } else {
-  //  this.clearBomb();
-  // }
-
-    // if (!this.catchBomb()) {
-    // }
-    // if (this.catchBomb()) {
-    //     this.setOfBombs.splice(i, 1);
-    // }
-    // this.bomb.update();
-    // this.setOfBombs[i].crashWith();
-
-  // this.setOfBombs.forEach(function(e,i){
-  //   if (!this.setOfBombs[i].catchBomb()) {
-  //     this.setOfBombs[i].update();
-  //     this.setOfBombs[i].crashWith();
-  //   } else {
-  //     this.setOfBombs.splice(0,1);
-  //   }
-  // }.bind(this))
-  // this.crashWith();
-  // if (this.catchBomb()) {
-  //    this.setOfBombs.splice(0,1);
-  // }
 
 
 

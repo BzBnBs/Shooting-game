@@ -24,3 +24,13 @@ Player.prototype.moveLeft = function () {
 Player.prototype.moveRight = function () {
   this.speedX += 1;
 }
+
+Player.prototype.catchBomb = function (bomb) {
+  var bombBottomY = bomb.y + bomb.height;
+  var playerTopY = this.y;
+  var playerRightX = this.x + this.width;
+  var bombRightX = bomb.x + bomb.width;
+  var playerLeftX = this.x;
+  var bombLeftX = bomb.x;
+  return bombBottomY >= playerTopY && bombLeftX >= playerLeftX - bomb.width && bombRightX <= playerRightX + bomb.width;
+}
