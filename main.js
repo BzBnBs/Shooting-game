@@ -69,6 +69,9 @@ MyGameArea.prototype.setKeys = function () {
       case 32:
         console.log("32");
         this.shooter.isMoving = true;
+        //NEW VERSION
+        this.shooter.newXCreator();
+        console.log("New x is: " + this.shooter.newX);
       case 37:
         this.player.moveLeft();
         break;
@@ -80,33 +83,41 @@ MyGameArea.prototype.setKeys = function () {
 }
 
 MyGameArea.prototype.updateGameArea = function () {
-  
-  //SOLO UNA BOMBA
-
-//   this.clear();
-//   this.player.newPos();
-//   this.shooter.newPos();
-//   this.shooter.checkBoundries();
-//   this.delimitedByCanvas(this.player);
-//   this.player.update();
-//   this.shooter.update();
-//   this.bomb.newPos();
-//   if(!this.catchBomb()){
-//     this.bomb.update();
-//     this.crashWith();
-//   } else {
-//     this.bomb.clearBomb();
-//   }
-// }
-
-
-  //VARIAS BOMBAS (SET OF BOMBS)
-
   this.clear();
   this.player.newPos();
   this.shooter.newPos();
   this.delimitedByCanvas(this.player);
-  this.shooter.checkBoundries();
+
+//OLD OPTION-IT WORKS EXCEPT IN THE EDGES
+  // if (this.shooter.newX == this.shooter.x && this.shooter.isMoving == true){
+  //   this.shooter.changeDirection();
+  //   this.shooter.newXCreator();
+  //   // console.log(this.shooter.newXCreator);
+  // }
+//////////////////////////////////
+
+//NEW ALTERNATIVE - ONLY CAN BE MOVED BETWEEN 1PX
+  // if (this.shooter.isMoving == true) {
+  //   this.shooter.changeDirection();
+  //   // this.shooter.newXCreator();
+  //   // console.log(this.shooter.newXCreator);
+  // }
+//////////////////////////////////
+
+//NEW VERSION
+  if (this.shooter.isMoving == true && this.shooter.x <= 0){
+    this.shooter.speedX = 0;
+    this.shooter.movingRight = true;
+    this.shooter.moveRight();
+  } else if (this.shooter.isMoving == true && this.shooter.x >= this.width - this.shooter.x) {
+    this.shooter.speedX = 0;
+    this.shooter.movingRight = false;
+    this.shooter.moveLeft();
+  } else if (this.shooter.isMoving == true && this.shooter.x == this.shooter.newX) {
+    this.shooter.changeDirection();
+  }
+///////////////////////////////
+
   this.setOfBombs.forEach(function(bomb, index){
     bomb.newPos();
     bomb.update();
@@ -122,6 +133,4 @@ MyGameArea.prototype.updateGameArea = function () {
   this.player.update();
   this.shooter.update();
 }
-
-
 
