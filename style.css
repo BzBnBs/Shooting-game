@@ -1,6 +1,14 @@
- canvas {
-    border: 1px solid #000000;
+ #canvas {
+    /* border: 1px solid #000000; */
     background-color: #f1f1f1;
     width: 640;
     height: 480;
   }
+
+ #scoreboard {
+    /* border: 1px transparent #000000; */
+    background-color: pink;
+    width: 640;
+    height: 80;
+  }
+  

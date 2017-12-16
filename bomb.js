@@ -18,9 +18,5 @@ Bomb.prototype.newPos = function () {
 } 
 
 Bomb.prototype.moveDown = function () {
-  this.speedY = 1;
+  this.speedY = 2;
 }
-
-// Bomb.prototype.clearBomb = function () {
-//   this.context.clearRect(this.x, this.y, this.width, this.height);
-// }

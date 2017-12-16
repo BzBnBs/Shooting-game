@@ -5,6 +5,8 @@ $(document).ready(function () {
 function startGame() {
   var canvas = document.getElementById("canvas");
   var game = new MyGameArea(canvas.getContext("2d"), canvas.width, canvas.height);
+  var canvas2 = document.getElementById("scoreboard");
+  var scoreboard = new MyGameArea(canvas2.getContext("2d"), canvas2.width, canvas2.height);
   game.start();
 }
 
@@ -17,6 +19,7 @@ function MyGameArea (ctx, width, height) {
   this.shooter = new Shooter(0, 0, 30, 60, "red", this.context, this.width);
   // this.bomb = new Bomb(this.shooter.x, this.shooter.height/2, 30, 30, "black", this.context);
   this.setOfBombs = [];
+  this.counter = 0;
 }
 
 MyGameArea.prototype.start = function() {
@@ -52,7 +55,8 @@ MyGameArea.prototype.crashWith = function (bomb) {
 }
 
 MyGameArea.prototype.increaseNumBombs = function () {
-  var pushBombs = setInterval(function () { this.setOfBombs.push(new Bomb(this.shooter.x, this.shooter.height / 2, 30, 30, "black", this.context)); }.bind(this), 2000);
+  var pushBombs = setInterval(function () { 
+    this.setOfBombs.push(new Bomb(this.shooter.x, this.shooter.height / 2, 30, 30, "black", this.context)); }.bind(this), 2000);
   // var pushBombs = setInterval(function () { this.setOfBombs.push(this.bomb); }.bind(this), 2000);
   console.log(this.setOfBombs);
 }
@@ -62,6 +66,24 @@ MyGameArea.prototype.increaseNumBombs = function () {
 //     clearInterval(pushBombs);
 //   }
 // }
+
+MyGameArea.prototype.counting = function () {
+  this.counter += 1;
+  console.log("counter: " + this.counter);
+}
+
+MyGameArea.prototype.increaseShooterSpeed = function () {
+  if (this.counter < 5){
+    this.shooter.speedX = 1;
+    console.log("Shooter's speed: " + this.shooter.speedX);
+  } else if (this.counter <= 10){
+    this.shooter.speedX = 8;
+    console.log("Shooter's speed: " + this.shooter.speedX);
+  } else if (this.counter <= 15){
+    this.shooter.speedX = 8;
+    console.log("Shooter's speed: " + this.shooter.speedX);
+  }
+}
 
 MyGameArea.prototype.setKeys = function () {
   document.onkeydown = function (e) {
@@ -88,35 +110,18 @@ MyGameArea.prototype.updateGameArea = function () {
   this.shooter.newPos();
   this.delimitedByCanvas(this.player);
 
-//OLD OPTION-IT WORKS EXCEPT IN THE EDGES
-  // if (this.shooter.newX == this.shooter.x && this.shooter.isMoving == true){
-  //   this.shooter.changeDirection();
-  //   this.shooter.newXCreator();
-  //   // console.log(this.shooter.newXCreator);
-  // }
-//////////////////////////////////
-
-//NEW ALTERNATIVE - ONLY CAN BE MOVED BETWEEN 1PX
-  // if (this.shooter.isMoving == true) {
-  //   this.shooter.changeDirection();
-  //   // this.shooter.newXCreator();
-  //   // console.log(this.shooter.newXCreator);
-  // }
-//////////////////////////////////
-
-//NEW VERSION
-  if (this.shooter.isMoving == true && this.shooter.x <= 0){
-    this.shooter.speedX = 0;
+  if (this.shooter.isMoving == true && this.shooter.x <= 0) {
+    this.increaseShooterSpeed();
     this.shooter.movingRight = true;
     this.shooter.moveRight();
   } else if (this.shooter.isMoving == true && this.shooter.x >= this.width - this.shooter.x) {
-    this.shooter.speedX = 0;
+    this.increaseShooterSpeed();
     this.shooter.movingRight = false;
     this.shooter.moveLeft();
   } else if (this.shooter.isMoving == true && this.shooter.x == this.shooter.newX) {
     this.shooter.changeDirection();
+    this.increaseShooterSpeed();
   }
-///////////////////////////////
 
   this.setOfBombs.forEach(function(bomb, index){
     bomb.newPos();
@@ -126,11 +131,13 @@ MyGameArea.prototype.updateGameArea = function () {
     }
     bomb.update();
     if(this.player.catchBomb(bomb)){
+      this.counting();
+      // this.increaseSpeed();
       this.setOfBombs.splice(index, 1);
     }
     this.crashWith(bomb);
   }.bind(this))
+
   this.player.update();
   this.shooter.update();
 }
-
