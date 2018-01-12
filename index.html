@@ -9,14 +9,27 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 </head>
 <body>
-  <canvas id="canvas" width="640" height="480"></canvas>
-<!-- <body> -->
-  <canvas id="scoreboard" width="640" height="100"></canvas>
+
+  <div id = "board">
+    <div id = "score">
+      <div id = "banner-score" class="disable"> </div>
+      <div id = "counter" class="disable"> </div>
+    </div>
+
+    <ul class="disable"> 
+      <li class = "heart"> </li>
+      <li class = "heart"> </li>
+      <li class = "heart"> </li>
+    </ul>
+
+  </div>
+
+  <canvas id="canvas" width="640" height="480" class="disable"></canvas>
   <script src = "shooter.js"></script>
   <script src="player.js"></script>
   <script src="bomb.js"></script>
   <script src="scores.js"></script>
   <script src="main.js"></script>
-  <!-- <script src="clases.js"></script> -->
+  
 </body>
 </html>

@@ -1,12 +1,19 @@
 $(document).ready(function () {
+  $('body').keyup(function(){
+    $('body').css('background-image', 'url("img/black-wall-design.jpg")');
+    $('#banner-score').removeClass('disable');
+    $('#counter').removeClass('disable');
+    $('ul').removeClass('disable');
+    $('canvas').removeClass('disable');
+  })
   startGame();
 });
 
 function startGame() {
   var canvas = document.getElementById("canvas");
   var game = new MyGameArea(canvas.getContext("2d"), canvas.width, canvas.height);
-  var canvas2 = document.getElementById("scoreboard");
-  var scoreboard = new MyGameArea(canvas2.getContext("2d"), canvas2.width, canvas2.height);
+  // var canvas2 = document.getElementById("scoreboard");
+  // var scoreboard = new MyGameArea(canvas2.getContext("2d"), canvas2.width, canvas2.height);
   game.start();
 }
 
@@ -15,11 +22,17 @@ function MyGameArea (ctx, width, height) {
   this.height = height;
   this.context = ctx;
   this.interval;
-  this.player = new Player(0, 450, 60, 15, "blue", this.context);
-  this.shooter = new Shooter(0, 0, 30, 60, "red", this.context, this.width);
+  this.player = new Player(0, 450, 80, 10, "white", this.context);
+  this.shooter = new Shooter(0, 0, 100, 60, "img/cloud-11.png", this.context, this.width, "image");
   // this.bomb = new Bomb(this.shooter.x, this.shooter.height/2, 30, 30, "black", this.context);
   this.setOfBombs = [];
   this.counter = 0;
+  this.lifes = 3;
+  this.catchingSound = new Audio('sound/Recoge.wav');
+  this.loseLifeSound = new Audio('sound/Se escapa.wav');
+  this.finishSound = new Audio('sound/Pierde Juego.wav');
+  this.throwingSound = new Audio('sound/Lanza.wav');
+  document.getElementById("counter").innerHTML = this.counter;
 }
 
 MyGameArea.prototype.start = function() {
@@ -34,6 +47,7 @@ MyGameArea.prototype.clear = function() {
 
 MyGameArea.prototype.stop = function(){
   clearInterval(this.interval);
+  // this.throwingSound.pause();
 }
 
 MyGameArea.prototype.delimitedByCanvas = function (component) {
@@ -49,15 +63,38 @@ MyGameArea.prototype.delimitedByCanvas = function (component) {
 }
 
 MyGameArea.prototype.crashWith = function (bomb) {
-    if (bomb.y + bomb.height >= this.height) {
+  if (bomb.y + bomb.height == this.height && this.lifes > 1) {
+    this.deleteLifes();
+  } 
+  else if (bomb.y + bomb.height == this.height && this.lifes === 1) {
+    $('ul li:last-child').css("background-image", "url('img/heart-09.png')");
+    this.loseLifeSound.play();
+    this.finishSound.play();
     this.stop();
+  }
+  console.log("num of lifes:" + this.lifes);
+}
+
+MyGameArea.prototype.deleteLifes = function () {
+  if (this.lifes === 3) {
+    this.lifes = 2;
+    $('ul li:first-child').css("background-image", "url('img/heart-09.png')");
+    this.loseLifeSound.play();
+  }
+  else if (this.lifes === 2) {
+    this.lifes = 1;
+    $('ul li:nth-child(2)').css("background-image", "url('img/heart-09.png')");
+    this.loseLifeSound.play();
   }
 }
 
 MyGameArea.prototype.increaseNumBombs = function () {
   var pushBombs = setInterval(function () { 
-    this.setOfBombs.push(new Bomb(this.shooter.x, this.shooter.height / 2, 30, 30, "black", this.context)); }.bind(this), 2000);
-  // var pushBombs = setInterval(function () { this.setOfBombs.push(this.bomb); }.bind(this), 2000);
+    this.setOfBombs.push(
+      new Bomb(this.shooter.x, this.shooter.height, 30, 30, "img/circle-05.png", this.context, "image")
+    ); 
+    // this.throwingSound.play();
+  }.bind(this), 3000);
   console.log(this.setOfBombs);
 }
 
@@ -69,6 +106,7 @@ MyGameArea.prototype.increaseNumBombs = function () {
 
 MyGameArea.prototype.counting = function () {
   this.counter += 1;
+  document.getElementById("counter").innerHTML = this.counter;
   console.log("counter: " + this.counter);
 }
 
@@ -77,7 +115,7 @@ MyGameArea.prototype.increaseShooterSpeed = function () {
     this.shooter.speedX = 1;
     console.log("Shooter's speed: " + this.shooter.speedX);
   } else if (this.counter <= 10){
-    this.shooter.speedX = 8;
+    this.shooter.speedX = 4;
     console.log("Shooter's speed: " + this.shooter.speedX);
   } else if (this.counter <= 15){
     this.shooter.speedX = 8;
@@ -132,6 +170,7 @@ MyGameArea.prototype.updateGameArea = function () {
     bomb.update();
     if(this.player.catchBomb(bomb)){
       this.counting();
+      this.catchingSound.play();
       // this.increaseSpeed();
       this.setOfBombs.splice(index, 1);
     }

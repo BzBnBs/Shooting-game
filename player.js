@@ -6,6 +6,10 @@ function Player (x, y, width, height, color, ctx) {
   this.speedX = 0;
   this.ctx = ctx;
   this.color = color;
+  this.ctx.shadowColor = this.color;
+  this.ctx.shadowBlur = 10;
+  this.ctx.strokeStyle = this.color;
+  // this.ctx.
 }
 
 Player.prototype.update = function() {
